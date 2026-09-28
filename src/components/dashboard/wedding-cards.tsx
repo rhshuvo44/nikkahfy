@@ -62,9 +62,13 @@ function WeddingCard({ wedding }: { wedding: Wedding }) {
         ) : null}
       </dl>
 
-      <div className="mt-auto pt-2">
-        <Button asChild variant="outline" size="sm" className="w-full">
+      <div className="mt-auto grid grid-cols-2 gap-2 pt-2">
+        <Button asChild variant="outline" size="sm">
           <a href={`/dashboard/weddings/${id}/edit`}>Edit invitation</a>
+        </Button>
+        {/* The hub is where events, contacts, gallery and wishlist live. */}
+        <Button asChild variant="outline" size="sm">
+          <a href={`/dashboard/weddings/${id}`}>Content</a>
         </Button>
       </div>
     </article>

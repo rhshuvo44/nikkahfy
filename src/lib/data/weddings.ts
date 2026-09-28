@@ -1,7 +1,6 @@
 import "server-only";
 
-import { Types } from "mongoose";
-
+import { toObjectId } from "@/lib/data/object-id";
 import { getMongoose } from "@/lib/mongodb";
 import { WeddingModel, type Wedding } from "@/lib/models/wedding";
 import { deriveWeddingDateShort, type WeddingFormValues } from "@/lib/validation/wedding";
@@ -16,12 +15,6 @@ import { deriveWeddingDateShort, type WeddingFormValues } from "@/lib/validation
  * `null`, and every function treats that as "no such record" rather than
  * throwing, which keeps a junk URL param from producing a 500.
  */
-
-const OBJECT_ID = /^[0-9a-fA-F]{24}$/;
-
-function toObjectId(value: string): Types.ObjectId | null {
-  return OBJECT_ID.test(value) ? new Types.ObjectId(value) : null;
-}
 
 /** The subset of the form that maps onto document fields, after derivation. */
 type WeddingWrite = Omit<WeddingFormValues, "weddingDate"> & {
