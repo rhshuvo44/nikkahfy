@@ -4,11 +4,10 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { nextCookies } from "better-auth/next-js";
 
-import { getRawDb } from "@/lib/db/mongo";
+import { getRawDb } from "@/lib/mongodb";
+import { DEFAULT_USER_ROLE } from "@/lib/roles";
 
-export const USER_ROLES = ["USER", "SUPER_ADMIN"] as const;
-
-export type UserRole = (typeof USER_ROLES)[number];
+export { USER_ROLES, type UserRole } from "@/lib/roles";
 
 /**
  * Server-side Better Auth instance.
@@ -36,7 +35,7 @@ export const auth = betterAuth({
       role: {
         type: "string",
         required: false,
-        defaultValue: "USER",
+        defaultValue: DEFAULT_USER_ROLE,
         input: false,
       },
       disabled: {

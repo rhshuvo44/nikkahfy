@@ -9,8 +9,8 @@
 import process from "node:process";
 
 import { auth } from "@/lib/auth/config";
-import { connectMongoose, disconnectMongoose } from "@/lib/db/mongo";
-import { disconnectRawClient, getRawDb } from "@/lib/db/mongo";
+import { findUserByEmail, setUserDisabled, setUserRole } from "@/lib/data/users";
+import { disconnectMongoose } from "@/lib/mongodb";
 
 async function main() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
@@ -27,51 +27,30 @@ async function main() {
     throw new Error("ADMIN_PASSWORD must be at least 8 characters.");
   }
 
-  await connectMongoose();
-  const db = getRawDb();
-  const users = db.collection("user");
-
-  const existing = await users.findOne({ email });
+  const existing = await findUserByEmail(email);
 
   if (existing) {
-    await users.updateOne(
-      { email },
-      {
-        $set: {
-          role: "SUPER_ADMIN",
-          disabled: false,
-          name,
-          updatedAt: new Date(),
-        },
-      },
-    );
-
+    await setUserRole(email, "SUPER_ADMIN");
+    await setUserDisabled(email, false);
     console.log(`Promoted existing user ${email} to SUPER_ADMIN.`);
   } else {
+    // Sign-up goes through Better Auth so password hashing and the account
+    // collection are written exactly as they would be for a real user.
     await auth.api.signUpEmail({ body: { email, password, name } });
-
-    await users.updateOne({ email }, { $set: { role: "SUPER_ADMIN" } });
-
+    await setUserRole(email, "SUPER_ADMIN");
     console.log(`Created SUPER_ADMIN user ${email}.`);
   }
 
-  const saved = await users.findOne(
-    { email },
-    { projection: { _id: 1, email: 1, name: 1, role: 1, disabled: 1 } },
-  );
-
-  console.log("Result:", saved);
+  console.log("Result:", await findUserByEmail(email));
 }
 
 main()
   .then(async () => {
     await disconnectMongoose();
-    await disconnectRawClient();
     process.exit(0);
   })
   .catch(async (error) => {
     console.error(error instanceof Error ? error.message : error);
     await disconnectMongoose().catch(() => {});
-    await disconnectRawClient().catch(() => {});
     process.exit(1);
   });

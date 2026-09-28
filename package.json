@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "seed:admin": "node --conditions=react-server --env-file-if-exists=.env.local --import tsx scripts/seed-admin.ts"
+    "seed:admin": "node --conditions=react-server --env-file-if-exists=.env.local --import tsx scripts/seed-admin.ts",
+    "verify:auth": "node --conditions=react-server --env-file-if-exists=.env.local --import tsx scripts/verify-auth.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
